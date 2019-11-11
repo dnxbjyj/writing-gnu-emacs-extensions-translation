@@ -37,3 +37,19 @@ Emacs对于解决上述场景的问题无能为力，这使得在你的文档中
 
 ---
 > 英文版PDF位置：P43
+
+使用`defvar`给一个变量赋默认值和使用`setq`赋值是不同的，`setq`是无条件地给变量赋值，而`defvar`仅仅在变量还没有被赋值的情况下才会给变量赋值（如果变量已经有值了，则不再进行赋值）。
+
+这一点为什么很重要呢？假设你的`.emacs`文件里面有这样一行代码：
+```emacs-lisp
+(setq mail-signature t)
+```
+
+这一行代码意味着，当你从Emacs内部发送邮件时，你希望附上你的签名文件。当启动Emacs时，`mail-signature`这个变量被赋值为`t`，但是实现发送邮件功能的Lisp代码文件——`sendmail`在这时还没有被加载，这个文件只有当你第一次执行`mail`命令发送邮件时才会被加载。当你执行`mail`命令时，Emas会从`sendmail`代码文件中执行下面一行代码：
+```emacs-lisp
+(defvar mail-signature nil ...)
+```
+
+这行代码表示设置`mail-signature`这个变量的默认初始值为`nil`。但是，你已经在`.emacs`文件中给这个变量赋了一个值了，你并不希望在加载`sendmail`时把你已经赋的值覆盖掉。另一方面，如果你的`.emacs`文件中没有为`mail-signature`变量赋值，那么你可能希望在`sendmail`中使用`defvar`为它赋值。
+
+- 使用`defvar`
